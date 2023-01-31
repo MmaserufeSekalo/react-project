@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import "./Weather.css";
 import axios from "axios";
-import ClipLoader from "react-spinners/ClipLoader";
 
 export default function Weather(props) {
-  const [weatherData, setWeatherData] = useState({ ready: false });
+  const [weatherData, setWeatherData] = useState({});
   const [city, setCity] = useState(props.defaultCity);
 
   function showTemperature(response) {
-    console.log(response.data);
-
+    console.log(response);
     setWeatherData({
       ready: true,
+      date: new Date(response.data.dt * 1000),
+      icon: response.data.weather[0].icon,
       temperature: Math.round(response.data.main.data.temp),
       description: response.data.weather[0].description,
       humidity: response.data.main.humidity,
@@ -21,22 +21,18 @@ export default function Weather(props) {
   }
   function handleSubmit(event) {
     event.preventDeafault();
-    search();
   }
   function searchInput(event) {
-    event.preventDeafault();
     setCity(event.target.value);
   }
 
-  function search() {
-    const apiKey = `2ca73ec094788f6655563078c6d08278`;
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-    axios.get(url).then(showTemperature);
-  }
+  const apiKey = `2ca73ec094788f6655563078c6d08278`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  axios.get(url).then(showTemperature);
 
-  if (weatherData.ready) {
+  if (weatherData) {
     return (
-      <div className="container mt-1">
+      <div>
         <div className="row mt-3">
           <form onSubmit={handleSubmit}>
             <div className="col-sm-9">
@@ -61,7 +57,7 @@ export default function Weather(props) {
             <li>
               Last updated on{" "}
               <span>
-                <h4 className="day">Tuesday 18:20</h4>
+                <h4 className="day">{weatherData.date}</h4>
               </span>
               <span className="text-capitalize">{weatherData.description}</span>
             </li>

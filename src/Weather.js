@@ -3,7 +3,7 @@ import "./Weather.css";
 import axios from "axios";
 
 export default function Weather(props) {
-  const [weatherData, setWeatherData] = useState({});
+  const [weatherData, setWeatherData] = useState({ ready: false });
   const [city, setCity] = useState(props.defaultCity);
 
   function showTemperature(response) {
@@ -29,8 +29,7 @@ export default function Weather(props) {
   const apiKey = `2ca73ec094788f6655563078c6d08278`;
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
   axios.get(url).then(showTemperature);
-
-  if (weatherData) {
+  if (weatherData.ready) {
     return (
       <div>
         <div className="row mt-3">
@@ -48,43 +47,47 @@ export default function Weather(props) {
               <input type="submit" value="Search" className="btn btn-primary" />
             </div>
           </form>
-        </div>
-        <div className="update">
-          <ul>
-            <li>
-              <h3>{weatherData.city}</h3>
-            </li>
-            <li>
-              Last updated on{" "}
-              <span>
-                <h4 className="day">{weatherData.date}</h4>
-              </span>
-              <span className="text-capitalize">{weatherData.description}</span>
-            </li>
-          </ul>
-        </div>
-        <div className="row">
-          <div className="col-sm-2">
-            <img
-              src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
-              alt="partly cloudy"
-              className="img-fluid"
-            />
-          </div>
-          <div className="col-sm-4">
-            {" "}
-            <div className="currentTemp">{weatherData.temperature} °C</div>
-          </div>
-          <div className="col-sm-6">
-            <ul>
-              <li>Humidity {weatherData.humidity}%</li>
-              <li>Wind {weatherData.wind} Km/H</li>
-            </ul>
+          <div>
+            <div className="update">
+              <ul>
+                <li>
+                  <h3>{weatherData.city}</h3>
+                </li>
+                <li>
+                  Last updated on{" "}
+                  <span>
+                    <h4 className="day">{weatherData.date}</h4>
+                  </span>
+                  <span className="text-capitalize">
+                    {weatherData.description}
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div className="row">
+              <div className="col-sm-2">
+                <img
+                  src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
+                  alt="partly cloudy"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-sm-4">
+                {" "}
+                <div className="currentTemp">{weatherData.temperature} °C</div>
+              </div>
+              <div className="col-sm-6">
+                <ul>
+                  <li>Humidity {weatherData.humidity}%</li>
+                  <li>Wind {weatherData.wind} Km/H</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     );
   } else {
-    return <h1>Loading.....</h1>;
+    <h4>Loading</h4>;
   }
 }

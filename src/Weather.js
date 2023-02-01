@@ -1,93 +1,72 @@
 import React, { useState } from "react";
-import "./Weather.css";
+
+import WeatherForecast from "./WeatherForecast";
 import axios from "axios";
+import "./Weather.css";
+import WeatherInformation from "./WeatherInformation";
 
 export default function Weather(props) {
   const [weatherData, setWeatherData] = useState({ ready: false });
   const [city, setCity] = useState(props.defaultCity);
 
-  function showTemperature(response) {
-    console.log(response);
+  function handleResponse(response) {
     setWeatherData({
       ready: true,
-      date: new Date(response.data.dt * 1000),
-      icon: response.data.weather[0].icon,
-      temperature: Math.round(response.data.main.data.temp),
-      description: response.data.weather[0].description,
+      coordinates: response.data.coord,
+      temperature: response.data.main.temp,
       humidity: response.data.main.humidity,
+      date: new Date(response.data.dt * 1000),
+      description: response.data.weather[0].description,
+      icon: response.data.weather[0].icon,
       wind: response.data.wind.speed,
       city: response.data.name,
     });
   }
+
   function handleSubmit(event) {
-    event.preventDeafault();
+    event.preventDefault();
+    search();
   }
-  function searchInput(event) {
+
+  function handleCityChange(event) {
     setCity(event.target.value);
   }
 
-  const apiKey = `2ca73ec094788f6655563078c6d08278`;
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-  axios.get(url).then(showTemperature);
+  function search() {
+    const apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    axios.get(apiUrl).then(handleResponse);
+  }
+
   if (weatherData.ready) {
     return (
-      <div>
-        <div className="row mt-3">
-          <form onSubmit={handleSubmit}>
-            <div className="col-sm-9">
-              {" "}
+      <div className="Weather">
+        <form onSubmit={handleSubmit}>
+          <div className="row">
+            <div className="col-9">
               <input
                 type="search"
-                placeholder="Enter your city here.."
-                onChange={searchInput}
+                placeholder="Enter a city.."
                 className="form-control"
-              />{" "}
+                autoFocus="on"
+                onChange={handleCityChange}
+              />
             </div>
-            <div className="col-sm-3">
-              <input type="submit" value="Search" className="btn btn-primary" />
-            </div>
-          </form>
-          <div>
-            <div className="update">
-              <ul>
-                <li>
-                  <h3>{weatherData.city}</h3>
-                </li>
-                <li>
-                  Last updated on{" "}
-                  <span>
-                    <h4 className="day">{weatherData.date}</h4>
-                  </span>
-                  <span className="text-capitalize">
-                    {weatherData.description}
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div className="row">
-              <div className="col-sm-2">
-                <img
-                  src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
-                  alt="partly cloudy"
-                  className="img-fluid"
-                />
-              </div>
-              <div className="col-sm-4">
-                {" "}
-                <div className="currentTemp">{weatherData.temperature} °C</div>
-              </div>
-              <div className="col-sm-6">
-                <ul>
-                  <li>Humidity {weatherData.humidity}%</li>
-                  <li>Wind {weatherData.wind} Km/H</li>
-                </ul>
-              </div>
+            <div className="col-3">
+              <input
+                type="submit"
+                value="Search"
+                className="btn btn-primary w-100"
+              />
             </div>
           </div>
-        </div>
+        </form>
+        <WeatherInformation data={weatherData} />
+        <WeatherForecast coordinates={weatherData.coordinates} />
       </div>
     );
   } else {
-    <h4>Loading</h4>;
+    search();
+    return "Loading...";
   }
 }
